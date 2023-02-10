@@ -1,0 +1,54 @@
+import csv
+from collections import defaultdict
+
+# Read csv file
+with open('csv filet name', 'r') as csvfile:
+    reader = csv.reader(csvfile, delimiter=';')
+    # Skip header row
+    next(reader)
+    # Create a dictionary to store user_id and segment mapping
+    data = defaultdict(str)
+    for row in reader:
+        user_id, segment = row
+        data[user_id] = segment
+
+# Divide users into 2 groups with equal number of users in each group
+users = list(data.keys())
+segments = list(set(data.values()))
+group1_users = []
+group2_users = []
+for segment in segments:
+    segment_users = [user for user in users if data[user] == segment]
+    n = len(segment_users)
+    group1_users += segment_users[:n//2]
+    group2_users += segment_users[n//2:]
+
+# Write group 1 users to a csv file
+with open('group1.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile, delimiter=';')
+    writer.writerow(['user_id'])
+    for user in group1_users:
+        writer.writerow([user])
+
+# Write group 2 users to a csv file
+with open('group2.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile, delimiter=';')
+    writer.writerow(['user_id'])
+    for user in group2_users:
+        writer.writerow([user])
+
+# Print number of users in each segment in each group
+group1_data = defaultdict(int)
+group2_data = defaultdict(int)
+for user in group1_users:
+    group1_data[data[user]] += 1
+for user in group2_users:
+    group2_data[data[user]] += 1
+
+print("Number of users in each segment in group 1:")
+for segment in group1_data:
+    print(f"{segment}: {group1_data[segment]}")
+
+print("Number of users in each segment in group 2:")
+for segment in group2_data:
+    print(f"{segment}: {group2_data[segment]}")
